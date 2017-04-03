@@ -1,0 +1,5 @@
+id;owner.id;data;mandatory;type;mode;secured
+service:storage:owncloud:url;service:storage:owncloud;;true;TEXT;;
+service:storage:owncloud:user;service:storage:owncloud;;true;TEXT;;true
+service:storage:owncloud:password;service:storage:owncloud;;true;TEXT;;true
+service:storage:owncloud:directory;service:storage:owncloud;;true;INTEGER;;

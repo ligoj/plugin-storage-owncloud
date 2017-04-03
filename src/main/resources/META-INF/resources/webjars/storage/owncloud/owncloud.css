@@ -1,0 +1,12 @@
+.masonry-container .node.service-storage-owncloud.mode-th-list table.subscriptions th.features {
+	width: 68px;
+}
+.masonry-container .node.service-storage-owncloud.mode-th-large table.subscriptions th.features {
+	width: 70px;
+}
+.masonry-container .node.service-storage-owncloud table.subscriptions th.features {
+	width: 55px;
+}
+.service-storage-owncloud .features>.details {
+	cursor: default;
+}

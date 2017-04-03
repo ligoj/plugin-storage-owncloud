@@ -1,0 +1,5 @@
+parameter.id;data;node.id;subscription.id!
+service:storage:owncloud:url;http://localhost:8120;service:storage:owncloud:dig;
+service:storage:owncloud:password;junit;service:storage:owncloud:dig;
+service:storage:owncloud:user;secret;service:storage:owncloud:dig;
+service:storage:owncloud:directory;22454;;1

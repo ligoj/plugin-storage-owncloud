@@ -1,0 +1,4 @@
+id;name;refined.id;mode;uiClasses;tag;tagUiClasses
+service:storage;Storage;;LINK;fa fa-database;functional;fa fa-suitcase
+service:storage:owncloud;ownCloud;service:storage;LINK;;;
+service:storage:owncloud:dig;ownCloud DIG;service:storage:owncloud;LINK;;;
