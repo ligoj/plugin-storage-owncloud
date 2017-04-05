@@ -32,13 +32,14 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * OwnCloud resource.
- * Also see "index.php/apps/files/ajax/list.php" : My files
+ * OwnCloud resource. Also see "index.php/apps/files/ajax/list.php" : My files
  */
 @Path(OwnCloudPluginResource.URL)
 @Service
 @Produces(MediaType.APPLICATION_JSON)
 public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource implements StorageServicePlugin {
+
+	private static final String VERSION_TAG = "<h3>Version";
 
 	/**
 	 * Plug-in key.
@@ -51,7 +52,8 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 	public static final String KEY = URL.replace('/', ':').substring(1);
 
 	/**
-	 * Public server URL used to fetch the last available version of the product.
+	 * Public server URL used to fetch the last available version of the
+	 * product.
 	 */
 	@Value("${service-storage-owncloud-server:https://owncloud.org}")
 	private String publicServer;
@@ -126,7 +128,8 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 	}
 
 	/**
-	 * Return a OwnCloud's resource. Return <code>null</code> when the resource is not found.
+	 * Return a OwnCloud's resource. Return <code>null</code> when the resource
+	 * is not found.
 	 */
 	protected String getResource(final Map<String, String> parameters, final String resource) {
 		return newProcessor(parameters).get(StringUtils.appendIfMissing(parameters.get(PARAMETER_URL), "/") + resource);
@@ -135,7 +138,8 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 	@Override
 	public String getVersion(final Map<String, String> parameters) throws Exception {
 		// Get the version from the JSON status
-		return (String) new ObjectMapper().readValue(StringUtils.defaultIfEmpty(getResource(parameters, "status.php"), "{}"), Map.class)
+		return (String) new ObjectMapper()
+				.readValue(StringUtils.defaultIfEmpty(getResource(parameters, "status.php"), "{}"), Map.class)
 				.get("version");
 	}
 
@@ -144,36 +148,43 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 	 */
 	protected List<SharedDirectory> getDirectories(final Map<String, String> parameters) throws IOException {
 		return new ObjectMapper()
-				.readValue(StringUtils.removeEnd(StringUtils.removeStart(StringUtils.defaultIfEmpty(
-						getResource(parameters, "ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"), "{\"ocs\":{\"data\":[]}}"), "{\"ocs\":"),
-						"}"), SharedDirectories.class)
-				.getData().stream().filter(d -> d.getType().equals("folder")).distinct().collect(Collectors.toList());
+				.readValue(
+						StringUtils.removeEnd(StringUtils.removeStart(StringUtils.defaultIfEmpty(
+								getResource(parameters, "ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"),
+								"{\"ocs\":{\"data\":[]}}"), "{\"ocs\":"), "}"),
+						SharedDirectories.class)
+				.getData().stream().filter(d -> "folder".equals(d.getType())).distinct().collect(Collectors.toList());
 	}
 
 	/**
 	 * Return OwnCloud directory from its identifier.
 	 */
-	protected Directory getDirectory(final Map<String, String> parameters, final int id) throws IOException, URISyntaxException {
+	protected Directory getDirectory(final Map<String, String> parameters, final int id)
+			throws IOException, URISyntaxException {
 		// First, get the directory path
-		final SharedDirectory sharedDirectory = getDirectories(parameters).stream().filter(project -> project.getId().equals(id)).findFirst()
-				.orElse(null);
+		final SharedDirectory sharedDirectory = getDirectories(parameters).stream()
+				.filter(project -> project.getId().equals(id)).findFirst().orElse(null);
 		if (sharedDirectory == null) {
 			// Shared directory is not found
 			return null;
 		}
 
 		// The, get the directory size from the content's size
-		final String path = "index.php/apps/files/ajax/list.php?dir=" + new URI("http", sharedDirectory.getPath(), "").toURL().getPath();
-		final String files = StringUtils.removeEnd(
-				StringUtils.removeStart(StringUtils.defaultIfEmpty(getResource(parameters, path), "{\"data\":{\"files\":[]}}"), "{\"data\":"), "}");
+		final String path = "index.php/apps/files/ajax/list.php?dir="
+				+ new URI("http", sharedDirectory.getPath(), "").toURL().getPath();
+		final String files = StringUtils.removeEnd(StringUtils.removeStart(
+				StringUtils.defaultIfEmpty(getResource(parameters, path), "{\"data\":{\"files\":[]}}"), "{\"data\":"),
+				"}");
 		final Directory directory = new Directory();
 		NamedBean.copy(sharedDirectory, directory);
-		directory.setSize(new ObjectMapper().readValue(files, Directories.class).getFiles().stream().mapToLong(Directory::getSize).sum());
+		directory.setSize(new ObjectMapper().readValue(files, Directories.class).getFiles().stream()
+				.mapToLong(Directory::getSize).sum());
 		return directory;
 	}
 
 	/**
-	 * Search the OwnCloud the projects matching to the given criteria. Name only is considered.
+	 * Search the OwnCloud the projects matching to the given criteria. Name
+	 * only is considered.
 	 * 
 	 * @param node
 	 *            the node to be tested with given parameters.
@@ -184,7 +195,8 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 	@GET
 	@Path("{node}/{criteria}")
 	@Consumes(MediaType.APPLICATION_JSON)
-	public List<Directory> findAllByName(@PathParam("node") final String node, @PathParam("criteria") final String criteria) throws Exception {
+	public List<Directory> findAllByName(@PathParam("node") final String node,
+			@PathParam("criteria") final String criteria) throws IOException {
 
 		// Prepare the context, an ordered set of projects
 		final Format format = new NormalizeFormat();
@@ -192,12 +204,13 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 		final Map<String, String> parameters = nodeResource.getParametersAsMap(node);
 
 		// Get the projects and parse them
-		return getDirectories(parameters).stream().filter(d -> format.format(d.getName()).contains(formatCriteria)).map(d -> {
-			final Directory dir = new Directory();
-			dir.setId(d.getId());
-			dir.setName(StringUtils.removeStart(d.getName(), "/"));
-			return dir;
-		}).collect(Collectors.toList());
+		return getDirectories(parameters).stream().filter(d -> format.format(d.getName()).contains(formatCriteria))
+				.map(d -> {
+					final Directory dir = new Directory();
+					dir.setId(d.getId());
+					dir.setName(StringUtils.removeStart(d.getName(), "/"));
+					return dir;
+				}).collect(Collectors.toList());
 	}
 
 	@Override
@@ -207,13 +220,16 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 
 	@Override
 	public String getLastVersion() throws Exception {
-		final String changelog = StringUtils.defaultIfEmpty(new CurlProcessor().get(publicServer + "/changelog/"), "<h3>Version");
-		final int start = Math.min(Math.max(changelog.indexOf("<h3>Version"), 0) + "<h3>Version".length(), changelog.length());
+		final String changelog = StringUtils.defaultIfEmpty(new CurlProcessor().get(publicServer + "/changelog/"),
+				VERSION_TAG);
+		final int start = Math.min(Math.max(changelog.indexOf(VERSION_TAG), 0) + VERSION_TAG.length(),
+				changelog.length());
 		return changelog.substring(start, Math.max(changelog.indexOf('<', start), start));
 	}
 
 	@Override
-	public SubscriptionStatusWithData checkSubscriptionStatus(final String node, final Map<String, String> parameters) throws Exception {
+	public SubscriptionStatusWithData checkSubscriptionStatus(final String node, final Map<String, String> parameters)
+			throws Exception {
 		final SubscriptionStatusWithData nodeStatusWithData = new SubscriptionStatusWithData();
 		nodeStatusWithData.put("directory", validateProject(parameters));
 		return nodeStatusWithData;
