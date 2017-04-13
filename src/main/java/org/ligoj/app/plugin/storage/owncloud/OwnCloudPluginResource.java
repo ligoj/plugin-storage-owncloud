@@ -228,7 +228,7 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 	}
 
 	@Override
-	public SubscriptionStatusWithData checkSubscriptionStatus(final String node, final Map<String, String> parameters)
+	public SubscriptionStatusWithData checkSubscriptionStatus(final Map<String, String> parameters)
 			throws Exception {
 		final SubscriptionStatusWithData nodeStatusWithData = new SubscriptionStatusWithData();
 		nodeStatusWithData.put("directory", validateProject(parameters));
@@ -236,7 +236,7 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 	}
 
 	@Override
-	public boolean checkStatus(final String node, final Map<String, String> parameters) throws Exception {
+	public boolean checkStatus(final Map<String, String> parameters) throws Exception {
 		// Status is UP <=> Administration access is UP
 		validateAdminAccess(parameters);
 		return true;
