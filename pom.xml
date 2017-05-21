@@ -14,6 +14,12 @@
 	<packaging>jar</packaging>
 	<name>Ligoj - Plugin Storage Owncloud</name>
 
+	<scm>
+		<connection>scm:git:https://github.com/ligoj/plugin-storage-owncloud</connection>
+		<developerConnection>scm:git:https://github.com/ligoj/plugin-storage-owncloud</developerConnection>
+		<url>https://github.com/ligoj/plugin-storage-owncloud.git</url>
+	</scm>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.ligoj.plugin</groupId>
