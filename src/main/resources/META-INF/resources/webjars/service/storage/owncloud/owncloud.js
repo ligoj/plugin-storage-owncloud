@@ -25,7 +25,7 @@ define(function () {
 		 * @return {string}              The owncloud http link.
 		 */
 		getOwnCloudLink: function (subscription) {
-			return subscription.parameters['service:storage:owncloud:url'] + '/apps/files/?dir=%2F' + ((subscription.data && subscription.data.directory.name) || '');
+			return subscription.data && subscription.data.directory && (typeof subscription.data.directory.name === 'string') && (subscription.parameters['service:storage:owncloud:url'] + '/apps/files/?dir=%2F' + subscription.data.directory.name);
 		},
 
 		/**
