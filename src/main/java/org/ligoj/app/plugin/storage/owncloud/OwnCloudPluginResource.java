@@ -201,7 +201,7 @@ public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource imp
 		// Prepare the context, an ordered set of projects
 		final Format format = new NormalizeFormat();
 		final String formatCriteria = format.format(criteria);
-		final Map<String, String> parameters = nodeResource.getParametersAsMap(node);
+		final Map<String, String> parameters = pvResource.getNodeParameters(node);
 
 		// Get the projects and parse them
 		return getDirectories(parameters).stream().filter(d -> format.format(d.getName()).contains(formatCriteria))
