@@ -21,7 +21,7 @@ import org.ligoj.app.api.SubscriptionStatusWithData;
 import org.ligoj.app.plugin.storage.StorageResource;
 import org.ligoj.app.plugin.storage.StorageServicePlugin;
 import org.ligoj.app.resource.NormalizeFormat;
-import org.ligoj.app.resource.plugin.AbstractXmlApiToolPluginResource;
+import org.ligoj.app.resource.plugin.AbstractToolPluginResource;
 import org.ligoj.app.resource.plugin.AuthCurlProcessor;
 import org.ligoj.app.resource.plugin.CurlProcessor;
 import org.ligoj.bootstrap.core.NamedBean;
@@ -37,7 +37,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Path(OwnCloudPluginResource.URL)
 @Service
 @Produces(MediaType.APPLICATION_JSON)
-public class OwnCloudPluginResource extends AbstractXmlApiToolPluginResource implements StorageServicePlugin {
+public class OwnCloudPluginResource extends AbstractToolPluginResource implements StorageServicePlugin {
 
 	private static final String VERSION_TAG = "<h3>Version";
 

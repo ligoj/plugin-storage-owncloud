@@ -1,7 +1,6 @@
 package org.ligoj.app.plugin.storage.owncloud;
 
-import org.junit.Test;
-import org.ligoj.app.plugin.storage.owncloud.SharedDirectory;
+import org.junit.jupiter.api.Test;
 import org.ligoj.bootstrap.model.AbstractBusinessEntityTest;
 
 /**

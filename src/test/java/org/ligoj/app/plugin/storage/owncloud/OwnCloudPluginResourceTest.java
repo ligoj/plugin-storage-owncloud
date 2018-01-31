@@ -14,10 +14,10 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.ligoj.app.AbstractServerTest;
 import org.ligoj.app.MatcherUtil;
 import org.ligoj.app.api.SubscriptionStatusWithData;
@@ -27,20 +27,18 @@ import org.ligoj.app.model.Parameter;
 import org.ligoj.app.model.ParameterValue;
 import org.ligoj.app.model.Project;
 import org.ligoj.app.model.Subscription;
-import org.ligoj.app.plugin.storage.owncloud.Directory;
-import org.ligoj.app.plugin.storage.owncloud.OwnCloudPluginResource;
 import org.ligoj.app.resource.subscription.SubscriptionResource;
 import org.ligoj.bootstrap.core.validation.ValidationJsonException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 /**
  * Test class of {@link OwnCloudPluginResource}
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = "classpath:/META-INF/spring/application-context-test.xml")
 @Rollback
 @Transactional
@@ -56,11 +54,10 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 
 	protected int subscription;
 
-	@Before
+	@BeforeEach
 	public void prepareData() throws IOException {
 		// Only with Spring context
-		persistEntities("csv",
-				new Class[] { Node.class, Parameter.class, Project.class, Subscription.class, ParameterValue.class },
+		persistEntities("csv", new Class[] { Node.class, Parameter.class, Project.class, Subscription.class, ParameterValue.class },
 				StandardCharsets.UTF_8.name());
 		this.subscription = getSubscription("gStack");
 
@@ -87,15 +84,15 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	@Test
 	public void getVersion() throws Exception {
 		prepareMockAdmin();
-		Assert.assertEquals("9.0.0.19", resource.getVersion(subscription));
+		Assertions.assertEquals("9.0.0.19", resource.getVersion(subscription));
 	}
 
 	@Test
 	public void getLastVersion() throws Exception {
 		// For sample 9.1.0
 		final int length = resource.getLastVersion().length();
-		Assert.assertTrue(length > 4);
-		Assert.assertTrue(length < 10);
+		Assertions.assertTrue(length > 4);
+		Assertions.assertTrue(length < 10);
 	}
 
 	@Test
@@ -110,22 +107,19 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 
 	@Test
 	public void linkNotFound() throws Exception {
-		thrown.expect(ValidationJsonException.class);
-		thrown.expect(MatcherUtil.validationMatcher("service:storage:owncloud:directory", "owncloud-directory"));
-
 		prepareMockProject();
 		httpServer.start();
 
 		parameterValueRepository.findAllBySubscription(subscription).stream()
-				.filter(v -> v.getParameter().getId().equals(OwnCloudPluginResource.PARAMETER_DIRECTORY)).findFirst()
-				.get().setData("0");
+				.filter(v -> v.getParameter().getId().equals(OwnCloudPluginResource.PARAMETER_DIRECTORY)).findFirst().get().setData("0");
 		em.flush();
 		em.clear();
 
 		// Invoke create for an already created entity, since for now, there is
 		// nothing but validation pour Owncloud
-		resource.link(this.subscription);
-		// Nothing to validate for now...
+		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> {
+			resource.link(this.subscription);
+		}), "service:storage:owncloud:directory", "owncloud-directory");
 	}
 
 	@Test
@@ -133,8 +127,8 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 		prepareMockProject();
 		final SubscriptionStatusWithData nodeStatusWithData = resource
 				.checkSubscriptionStatus(subscriptionResource.getParametersNoCheck(subscription));
-		Assert.assertTrue(nodeStatusWithData.getStatus().isUp());
-		Assert.assertEquals(138264416, ((Directory) nodeStatusWithData.getData().get("directory")).getSize());
+		Assertions.assertTrue(nodeStatusWithData.getStatus().isUp());
+		Assertions.assertEquals(138264416, ((Directory) nodeStatusWithData.getData().get("directory")).getSize());
 	}
 
 	private void prepareMockProject() throws IOException {
@@ -142,45 +136,35 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 		httpServer.stubFor(get(urlPathEqualTo("/")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody("")));
 
 		// Status
-		httpServer.stubFor(get(urlEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_OK)
-				.withBody(IOUtils.toString(new ClassPathResource("mock-server/owncloud/status.php").getInputStream(),
-						StandardCharsets.UTF_8))));
+		httpServer.stubFor(get(urlEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(
+				IOUtils.toString(new ClassPathResource("mock-server/owncloud/status.php").getInputStream(), StandardCharsets.UTF_8))));
 
 		// Shares json
 		httpServer.stubFor(get(urlEqualTo("/ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"))
-				.willReturn(aResponse().withStatus(HttpStatus.SC_OK)
-						.withBody(IOUtils.toString(
-								new ClassPathResource("mock-server/owncloud/sharing.php").getInputStream(),
-								StandardCharsets.UTF_8))));
+				.willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(IOUtils
+						.toString(new ClassPathResource("mock-server/owncloud/sharing.php").getInputStream(), StandardCharsets.UTF_8))));
 
 		// Directories json
 		httpServer.stubFor(get(urlEqualTo("/index.php/apps/files/ajax/list.php?dir=/projects/Sample"))
-				.willReturn(aResponse().withStatus(HttpStatus.SC_OK)
-						.withBody(IOUtils.toString(
-								new ClassPathResource("mock-server/owncloud/list.php").getInputStream(),
-								StandardCharsets.UTF_8))));
+				.willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(IOUtils
+						.toString(new ClassPathResource("mock-server/owncloud/list.php").getInputStream(), StandardCharsets.UTF_8))));
 		httpServer.start();
 	}
 
 	private void prepareMockProjectSearch() throws IOException {
 		// Status
-		httpServer.stubFor(get(urlEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_OK)
-				.withBody(IOUtils.toString(new ClassPathResource("mock-server/owncloud/status.php").getInputStream(),
-						StandardCharsets.UTF_8))));
+		httpServer.stubFor(get(urlEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(
+				IOUtils.toString(new ClassPathResource("mock-server/owncloud/status.php").getInputStream(), StandardCharsets.UTF_8))));
 
 		// Shares json
 		httpServer.stubFor(get(urlEqualTo("/ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"))
-				.willReturn(aResponse().withStatus(HttpStatus.SC_OK)
-						.withBody(IOUtils.toString(
-								new ClassPathResource("mock-server/owncloud/sharing.php").getInputStream(),
-								StandardCharsets.UTF_8))));
+				.willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(IOUtils
+						.toString(new ClassPathResource("mock-server/owncloud/sharing.php").getInputStream(), StandardCharsets.UTF_8))));
 
 		// Directories json
 		httpServer.stubFor(get(urlEqualTo("/index.php/apps/files/ajax/list.php?dir=/projects/Sample"))
-				.willReturn(aResponse().withStatus(HttpStatus.SC_OK)
-						.withBody(IOUtils.toString(
-								new ClassPathResource("mock-server/owncloud/list.php").getInputStream(),
-								StandardCharsets.UTF_8))));
+				.willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(IOUtils
+						.toString(new ClassPathResource("mock-server/owncloud/list.php").getInputStream(), StandardCharsets.UTF_8))));
 		httpServer.start();
 	}
 
@@ -189,40 +173,37 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 		httpServer.stubFor(get(urlPathEqualTo("/")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody("")));
 
 		// Status
-		httpServer.stubFor(get(urlEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_OK)
-				.withBody(IOUtils.toString(new ClassPathResource("mock-server/owncloud/status.php").getInputStream(),
-						StandardCharsets.UTF_8))));
+		httpServer.stubFor(get(urlEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(
+				IOUtils.toString(new ClassPathResource("mock-server/owncloud/status.php").getInputStream(), StandardCharsets.UTF_8))));
 		httpServer.start();
 	}
 
 	@Test
 	public void checkStatus() throws Exception {
 		prepareMockAdmin();
-		Assert.assertTrue(resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription)));
+		Assertions.assertTrue(resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription)));
 	}
 
 	@Test
 	public void checkStatusAuthenticationFailed() throws Exception {
-		thrown.expect(ValidationJsonException.class);
-		thrown.expect(MatcherUtil.validationMatcher(OwnCloudPluginResource.KEY + ":user", "owncloud-login"));
 		// Main entry
 		httpServer.stubFor(get(urlPathEqualTo("/")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody("")));
 
 		// Login failed
-		httpServer.stubFor(post(urlPathEqualTo("/status.php"))
-				.willReturn(aResponse().withStatus(HttpStatus.SC_FORBIDDEN).withBody("")));
+		httpServer.stubFor(post(urlPathEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_FORBIDDEN).withBody("")));
 		httpServer.start();
-		resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription));
+		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> {
+			resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription));
+		}), OwnCloudPluginResource.KEY + ":user", "owncloud-login");
 	}
 
 	@Test
 	public void checkStatusInvalidIndex() throws Exception {
-		thrown.expect(ValidationJsonException.class);
-		thrown.expect(MatcherUtil.validationMatcher(OwnCloudPluginResource.KEY + ":url", "owncloud-connection"));
-		httpServer.stubFor(get(urlPathEqualTo("/status.php"))
-				.willReturn(aResponse().withStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
+		httpServer.stubFor(get(urlPathEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
 		httpServer.start();
-		resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription));
+		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> {
+			resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription));
+		}), OwnCloudPluginResource.KEY + ":url", "owncloud-connection");
 	}
 
 	@Test
@@ -231,12 +212,12 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 		httpServer.start();
 
 		final List<Directory> projects = resource.findAllByName("service:storage:owncloud:dig", "p5");
-		Assert.assertEquals(1, projects.size());
-		Assert.assertEquals(8321, projects.get(0).getId().intValue());
-		Assert.assertEquals("P5-p0", projects.get(0).getName());
+		Assertions.assertEquals(1, projects.size());
+		Assertions.assertEquals(8321, projects.get(0).getId().intValue());
+		Assertions.assertEquals("P5-p0", projects.get(0).getName());
 
 		// Size is never computed in this mode
-		Assert.assertEquals(0, projects.get(0).getSize());
+		Assertions.assertEquals(0, projects.get(0).getSize());
 	}
 
 }
