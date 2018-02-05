@@ -88,7 +88,7 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void getLastVersion() throws Exception {
+	public void getLastVersion() {
 		// For sample 9.1.0
 		final int length = resource.getLastVersion().length();
 		Assertions.assertTrue(length > 4);
@@ -185,7 +185,7 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void checkStatusAuthenticationFailed() throws Exception {
+	public void checkStatusAuthenticationFailed() {
 		// Main entry
 		httpServer.stubFor(get(urlPathEqualTo("/")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody("")));
 
@@ -198,7 +198,7 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void checkStatusInvalidIndex() throws Exception {
+	public void checkStatusInvalidIndex() {
 		httpServer.stubFor(get(urlPathEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
 		httpServer.start();
 		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> {

@@ -219,7 +219,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	}
 
 	@Override
-	public String getLastVersion() throws Exception {
+	public String getLastVersion() {
 		final String changelog = StringUtils.defaultIfEmpty(new CurlProcessor().get(publicServer + "/changelog/"),
 				VERSION_TAG);
 		final int start = Math.min(Math.max(changelog.indexOf(VERSION_TAG), 0) + VERSION_TAG.length(),
