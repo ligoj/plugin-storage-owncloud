@@ -19,6 +19,11 @@ import lombok.Setter;
 @EqualsAndHashCode(of = "id")
 public class SharedDirectory implements INamableBean<Integer> {
 
+	/**
+	 * SID
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@JsonProperty("file_source")
 	private Integer id;
 

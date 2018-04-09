@@ -15,6 +15,11 @@ import lombok.Setter;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Directory extends NamedBean<Integer> {
 
+	/**
+	 * SID
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private long size;
 
 }
