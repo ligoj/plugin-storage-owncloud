@@ -52,8 +52,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	public static final String KEY = URL.replace('/', ':').substring(1);
 
 	/**
-	 * Public server URL used to fetch the last available version of the
-	 * product.
+	 * Public server URL used to fetch the last available version of the product.
 	 */
 	@Value("${service-storage-owncloud-server:https://owncloud.org}")
 	private String publicServer;
@@ -88,7 +87,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 
 	/**
 	 * Validate the project connectivity.
-	 * 
+	 *
 	 * @param parameters
 	 *            the project parameters.
 	 * @return project details.
@@ -108,7 +107,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 
 	/**
 	 * Validate the basic REST connectivity to Owncloud.
-	 * 
+	 *
 	 * @param parameters
 	 *            the server parameters.
 	 * @return the detected Owncloud version.
@@ -128,8 +127,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	}
 
 	/**
-	 * Return a OwnCloud's resource. Return <code>null</code> when the resource
-	 * is not found.
+	 * Return a OwnCloud's resource. Return <code>null</code> when the resource is not found.
 	 */
 	protected String getResource(final Map<String, String> parameters, final String resource) {
 		return newProcessor(parameters).get(StringUtils.appendIfMissing(parameters.get(PARAMETER_URL), "/") + resource);
@@ -148,11 +146,9 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	 */
 	protected List<SharedDirectory> getDirectories(final Map<String, String> parameters) throws IOException {
 		return new ObjectMapper()
-				.readValue(
-						StringUtils.removeEnd(StringUtils.removeStart(StringUtils.defaultIfEmpty(
-								getResource(parameters, "ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"),
-								"{\"ocs\":{\"data\":[]}}"), "{\"ocs\":"), "}"),
-						SharedDirectories.class)
+				.readValue(StringUtils.removeEnd(StringUtils.removeStart(StringUtils.defaultIfEmpty(
+						getResource(parameters, "ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"),
+						"{\"ocs\":{\"data\":[]}}"), "{\"ocs\":"), "}"), SharedDirectories.class)
 				.getData().stream().filter(d -> "folder".equals(d.getType())).distinct().collect(Collectors.toList());
 	}
 
@@ -183,9 +179,8 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	}
 
 	/**
-	 * Search the OwnCloud the projects matching to the given criteria. Name
-	 * only is considered.
-	 * 
+	 * Search the OwnCloud the projects matching to the given criteria. Name only is considered.
+	 *
 	 * @param node
 	 *            the node to be tested with given parameters.
 	 * @param criteria
@@ -220,16 +215,16 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 
 	@Override
 	public String getLastVersion() {
-		final String changelog = StringUtils.defaultIfEmpty(new CurlProcessor().get(publicServer + "/changelog/"),
-				VERSION_TAG);
-		final int start = Math.min(Math.max(changelog.indexOf(VERSION_TAG), 0) + VERSION_TAG.length(),
-				changelog.length());
-		return changelog.substring(start, Math.max(changelog.indexOf('<', start), start));
+		try (CurlProcessor curl = new CurlProcessor()) {
+			final String changelog = StringUtils.defaultIfEmpty(curl.get(publicServer + "/changelog/"), VERSION_TAG);
+			final int start = Math.min(Math.max(changelog.indexOf(VERSION_TAG), 0) + VERSION_TAG.length(),
+					changelog.length());
+			return changelog.substring(start, Math.max(changelog.indexOf('<', start), start));
+		}
 	}
 
 	@Override
-	public SubscriptionStatusWithData checkSubscriptionStatus(final Map<String, String> parameters)
-			throws Exception {
+	public SubscriptionStatusWithData checkSubscriptionStatus(final Map<String, String> parameters) throws Exception {
 		final SubscriptionStatusWithData nodeStatusWithData = new SubscriptionStatusWithData();
 		nodeStatusWithData.put("directory", validateProject(parameters));
 		return nodeStatusWithData;
