@@ -1,4 +1,4 @@
-{"data":{"directory":"\/projects\/Branche Production\/DIG\/Projets\/GFI - Chantier BI",
+{"data":{"directory":"\/projects\/Branche Production\/DIG\/Projets\/Ligoj - BI",
 "files":[
 	{"id":"22836","parentId":"22454","mtime":1473250833000,"name":"06-Configuration","permissions":31,"mimetype":"httpd\/unix-directory","size":10049,"type":"dir","etag":"57d006119091d"},
 	{"id":"22839","parentId":"22454","mtime":1473776975000,"name":"13-Documents applicatifs","permissions":31,"mimetype":"httpd\/unix-directory","size":3247004,"type":"dir","etag":"57d80d4f847bd"},
