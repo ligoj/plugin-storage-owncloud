@@ -88,11 +88,10 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	/**
 	 * Validate the project connectivity.
 	 *
-	 * @param parameters
-	 *            the project parameters.
+	 * @param parameters the project parameters.
 	 * @return project details.
 	 */
-	protected Directory validateProject(final Map<String, String> parameters) throws IOException, URISyntaxException {
+	private Directory validateProject(final Map<String, String> parameters) throws IOException, URISyntaxException {
 		// Get project's configuration
 		final int id = Integer.parseInt(ObjectUtils.defaultIfNull(parameters.get(PARAMETER_DIRECTORY), "0"));
 		final Directory result = getDirectory(parameters, id);
@@ -108,11 +107,11 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	/**
 	 * Validate the basic REST connectivity to Owncloud.
 	 *
-	 * @param parameters
-	 *            the server parameters.
+	 * @param parameters the server parameters.
 	 * @return the detected Owncloud version.
+	 * @throws IOException When OwnCloud JSON content cannot be parsed.
 	 */
-	protected String validateAdminAccess(final Map<String, String> parameters) throws Exception {
+	private String validateAdminAccess(final Map<String, String> parameters) throws IOException {
 		final String url = StringUtils.appendIfMissing(parameters.get(PARAMETER_URL), "/");
 
 		// Check access
@@ -127,14 +126,15 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	}
 
 	/**
-	 * Return a OwnCloud's resource. Return <code>null</code> when the resource is not found.
+	 * Return a OwnCloud's resource. Return <code>null</code> when the resource is
+	 * not found.
 	 */
-	protected String getResource(final Map<String, String> parameters, final String resource) {
+	private String getResource(final Map<String, String> parameters, final String resource) {
 		return newProcessor(parameters).get(StringUtils.appendIfMissing(parameters.get(PARAMETER_URL), "/") + resource);
 	}
 
 	@Override
-	public String getVersion(final Map<String, String> parameters) throws Exception {
+	public String getVersion(final Map<String, String> parameters) throws IOException {
 		// Get the version from the JSON status
 		return (String) new ObjectMapper()
 				.readValue(StringUtils.defaultIfEmpty(getResource(parameters, "status.php"), "{}"), Map.class)
@@ -144,7 +144,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	/**
 	 * Return all OwnCloud directories without limit.
 	 */
-	protected List<SharedDirectory> getDirectories(final Map<String, String> parameters) throws IOException {
+	private List<SharedDirectory> getDirectories(final Map<String, String> parameters) throws IOException {
 		return new ObjectMapper()
 				.readValue(StringUtils.removeEnd(StringUtils.removeStart(StringUtils.defaultIfEmpty(
 						getResource(parameters, "ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"),
@@ -155,7 +155,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	/**
 	 * Return OwnCloud directory from its identifier.
 	 */
-	protected Directory getDirectory(final Map<String, String> parameters, final int id)
+	private Directory getDirectory(final Map<String, String> parameters, final int id)
 			throws IOException, URISyntaxException {
 		// First, get the directory path
 		final SharedDirectory sharedDirectory = getDirectories(parameters).stream()
@@ -179,13 +179,13 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	}
 
 	/**
-	 * Search the OwnCloud the projects matching to the given criteria. Name only is considered.
+	 * Search the OwnCloud the projects matching to the given criteria. Name only is
+	 * considered.
 	 *
-	 * @param node
-	 *            the node to be tested with given parameters.
-	 * @param criteria
-	 *            the search criteria.
+	 * @param node     the node to be tested with given parameters.
+	 * @param criteria the search criteria.
 	 * @return project names matching the criteria.
+	 * @throws IOException When OwnCloud JSON content cannot be parsed.
 	 */
 	@GET
 	@Path("{node}/{criteria}")

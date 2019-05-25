@@ -42,7 +42,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ContextConfiguration(locations = "classpath:/META-INF/spring/application-context-test.xml")
 @Rollback
 @Transactional
-public class OwnCloudPluginResourceTest extends AbstractServerTest {
+class OwnCloudPluginResourceTest extends AbstractServerTest {
 	@Autowired
 	private OwnCloudPluginResource resource;
 
@@ -55,7 +55,7 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	protected int subscription;
 
 	@BeforeEach
-	public void prepareData() throws IOException {
+	void prepareData() throws IOException {
 		// Only with Spring context
 		persistEntities("csv", new Class[] { Node.class, Parameter.class, Project.class, Subscription.class, ParameterValue.class },
 				StandardCharsets.UTF_8.name());
@@ -69,12 +69,12 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	 * Return the subscription identifier of gStack. Assumes there is only one
 	 * subscription for a service.
 	 */
-	protected Integer getSubscription(final String project) {
+	private Integer getSubscription(final String project) {
 		return getSubscription(project, OwnCloudPluginResource.KEY);
 	}
 
 	@Test
-	public void delete() throws Exception {
+	void delete() throws Exception {
 		resource.delete(subscription, false);
 		em.flush();
 		em.clear();
@@ -82,13 +82,13 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void getVersion() throws Exception {
+	void getVersion() throws Exception {
 		prepareMockAdmin();
 		Assertions.assertEquals("9.0.0.19", resource.getVersion(subscription));
 	}
 
 	@Test
-	public void getLastVersion() {
+	void getLastVersion() {
 		// For sample 9.1.0
 		final int length = resource.getLastVersion().length();
 		Assertions.assertTrue(length > 4);
@@ -96,7 +96,7 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void link() throws Exception {
+	void link() throws Exception {
 		prepareMockProject();
 		httpServer.start();
 
@@ -106,7 +106,7 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void linkNotFound() throws Exception {
+	void linkNotFound() throws Exception {
 		prepareMockProject();
 		httpServer.start();
 
@@ -123,7 +123,7 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void checkSubscriptionStatus() throws Exception {
+	void checkSubscriptionStatus() throws Exception {
 		prepareMockProject();
 		final SubscriptionStatusWithData nodeStatusWithData = resource
 				.checkSubscriptionStatus(subscriptionResource.getParametersNoCheck(subscription));
@@ -179,13 +179,13 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void checkStatus() throws Exception {
+	void checkStatus() throws Exception {
 		prepareMockAdmin();
 		Assertions.assertTrue(resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription)));
 	}
 
 	@Test
-	public void checkStatusAuthenticationFailed() {
+	void checkStatusAuthenticationFailed() {
 		// Main entry
 		httpServer.stubFor(get(urlPathEqualTo("/")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody("")));
 
@@ -198,7 +198,7 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void checkStatusInvalidIndex() {
+	void checkStatusInvalidIndex() {
 		httpServer.stubFor(get(urlPathEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
 		httpServer.start();
 		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> {
@@ -207,7 +207,7 @@ public class OwnCloudPluginResourceTest extends AbstractServerTest {
 	}
 
 	@Test
-	public void findAllByName() throws Exception {
+	void findAllByName() throws Exception {
 		prepareMockProjectSearch();
 		httpServer.start();
 
