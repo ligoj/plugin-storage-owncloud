@@ -1,3 +1,6 @@
+/*
+ * Licensed under MIT (https://github.com/ligoj/ligoj/blob/master/LICENSE)
+ */
 package org.ligoj.app.plugin.storage.owncloud;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;

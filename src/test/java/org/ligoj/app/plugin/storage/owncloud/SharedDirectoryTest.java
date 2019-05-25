@@ -1,3 +1,6 @@
+/*
+ * Licensed under MIT (https://github.com/ligoj/ligoj/blob/master/LICENSE)
+ */
 package org.ligoj.app.plugin.storage.owncloud;
 
 import org.junit.jupiter.api.Test;
@@ -9,7 +12,7 @@ import org.ligoj.bootstrap.model.AbstractBusinessEntityTest;
 public class SharedDirectoryTest extends AbstractBusinessEntityTest {
 
 	@Test
-	public void testEqualsAndHash() throws Exception {
+	void testEqualsAndHash() throws Exception {
 		testEqualsAndHash(SharedDirectory.class);
 	}
 }
