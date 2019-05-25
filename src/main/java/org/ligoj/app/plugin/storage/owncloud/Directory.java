@@ -11,7 +11,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * OwnClound directory.
+ * OwnCloud directory.
  */
 @Getter
 @Setter
