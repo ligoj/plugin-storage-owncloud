@@ -12,7 +12,7 @@ define(function () {
 		 * Render Space ownCloud data.
 		 */
 		renderFeatures: function (subscription) {
-			var result = current.$super('renderServicelink')('home', current.getOwnCloudLink(subscription), 'service:storage:owncloud:directory', undefined, ' target="_blank"');
+			var result = current.$super('renderServiceLink')('home', current.getOwnCloudLink(subscription), 'service:storage:owncloud:directory', undefined, ' target="_blank"');
 			// Help
 			result += current.$super('renderServiceHelpLink')(subscription.parameters, 'service:storage:help');
 			return result;
