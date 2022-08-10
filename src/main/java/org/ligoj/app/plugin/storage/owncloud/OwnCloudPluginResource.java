@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 import java.text.Format;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -129,8 +128,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	}
 
 	/**
-	 * Return a OwnCloud's resource. Return <code>null</code> when the resource is
-	 * not found.
+	 * Return a OwnCloud's resource. Return <code>null</code> when the resource is not found.
 	 */
 	private String getResource(final Map<String, String> parameters, final String resource) {
 		return newProcessor(parameters).get(StringUtils.appendIfMissing(parameters.get(PARAMETER_URL), "/") + resource);
@@ -152,7 +150,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 				.readValue(StringUtils.removeEnd(StringUtils.removeStart(StringUtils.defaultIfEmpty(
 						getResource(parameters, "ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"),
 						"{\"ocs\":{\"data\":[]}}"), "{\"ocs\":"), "}"), SharedDirectories.class)
-				.getData().stream().filter(d -> "folder".equals(d.getType())).distinct().collect(Collectors.toList());
+				.getData().stream().filter(d -> "folder".equals(d.getType())).distinct().toList();
 	}
 
 	/**
@@ -182,8 +180,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	}
 
 	/**
-	 * Search the OwnCloud the projects matching to the given criteria. Name only is
-	 * considered.
+	 * Search the OwnCloud the projects matching to the given criteria. Name only is considered.
 	 *
 	 * @param node     the node to be tested with given parameters.
 	 * @param criteria the search criteria.
@@ -208,7 +205,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 					dir.setId(d.getId());
 					dir.setName(StringUtils.removeStart(d.getName(), "/"));
 					return dir;
-				}).collect(Collectors.toList());
+				}).toList();
 	}
 
 	@Override
