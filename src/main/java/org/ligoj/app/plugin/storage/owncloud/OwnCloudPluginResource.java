@@ -10,12 +10,12 @@ import java.text.Format;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +60,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	private String publicServer;
 
 	/**
-	 * OwnCloud user name able to connect to instance.
+	 * OwnCloud username able to connect to instance.
 	 */
 	public static final String PARAMETER_USER = KEY + ":user";
 
@@ -170,7 +170,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 		final String path = "index.php/apps/files/ajax/list.php?dir="
 				+ new URI("http", sharedDirectory.getPath(), "").toURL().getPath();
 		final String files = StringUtils.removeEnd(StringUtils.removeStart(
-				StringUtils.defaultIfEmpty(getResource(parameters, path), "{\"data\":{\"files\":[]}}"), "{\"data\":"),
+						StringUtils.defaultIfEmpty(getResource(parameters, path), "{\"data\":{\"files\":[]}}"), "{\"data\":"),
 				"}");
 		final Directory directory = new Directory();
 		NamedBean.copy(sharedDirectory, directory);

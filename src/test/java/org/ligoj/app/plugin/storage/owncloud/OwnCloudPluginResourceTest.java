@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-import javax.transaction.Transactional;
+import jakarta.transaction.Transactional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -60,16 +60,16 @@ class OwnCloudPluginResourceTest extends AbstractServerTest {
 	@BeforeEach
 	void prepareData() throws IOException {
 		// Only with Spring context
-		persistEntities("csv", new Class[] { Node.class, Parameter.class, Project.class, Subscription.class, ParameterValue.class },
-				StandardCharsets.UTF_8.name());
-		this.subscription = getSubscription("gStack");
+		persistEntities("csv", new Class[]{Node.class, Parameter.class, Project.class, Subscription.class, ParameterValue.class},
+				StandardCharsets.UTF_8);
+		this.subscription = getSubscription("Jupiter");
 
 		// Coverage only
-		resource.getKey();
+		Assertions.assertEquals("service:storage:owncloud", resource.getKey());
 	}
 
 	/**
-	 * Return the subscription identifier of gStack. Assumes there is only one
+	 * Return the subscription identifier of Jupiter. Assumes there is only one
 	 * subscription for a service.
 	 */
 	private Integer getSubscription(final String project) {
@@ -120,9 +120,7 @@ class OwnCloudPluginResourceTest extends AbstractServerTest {
 
 		// Invoke create for an already created entity, since for now, there is
 		// nothing but validation pour Owncloud
-		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> {
-			resource.link(this.subscription);
-		}), "service:storage:owncloud:directory", "owncloud-directory");
+		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> resource.link(this.subscription)), "service:storage:owncloud:directory", "owncloud-directory");
 	}
 
 	@Test
@@ -195,18 +193,14 @@ class OwnCloudPluginResourceTest extends AbstractServerTest {
 		// Login failed
 		httpServer.stubFor(post(urlPathEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_FORBIDDEN).withBody("")));
 		httpServer.start();
-		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> {
-			resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription));
-		}), OwnCloudPluginResource.KEY + ":user", "owncloud-login");
+		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription))), OwnCloudPluginResource.KEY + ":user", "owncloud-login");
 	}
 
 	@Test
 	void checkStatusInvalidIndex() {
 		httpServer.stubFor(get(urlPathEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_INTERNAL_SERVER_ERROR)));
 		httpServer.start();
-		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> {
-			resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription));
-		}), OwnCloudPluginResource.KEY + ":url", "owncloud-connection");
+		MatcherUtil.assertThrows(Assertions.assertThrows(ValidationJsonException.class, () -> resource.checkStatus(subscriptionResource.getParametersNoCheck(subscription))), OwnCloudPluginResource.KEY + ":url", "owncloud-connection");
 	}
 
 	@Test
