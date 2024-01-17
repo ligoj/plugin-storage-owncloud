@@ -60,7 +60,7 @@ class OwnCloudPluginResourceTest extends AbstractServerTest {
 	@BeforeEach
 	void prepareData() throws IOException {
 		// Only with Spring context
-		persistEntities("csv", new Class[]{Node.class, Parameter.class, Project.class, Subscription.class, ParameterValue.class},
+		persistEntities("csv", new Class<?>[]{Node.class, Parameter.class, Project.class, Subscription.class, ParameterValue.class},
 				StandardCharsets.UTF_8);
 		this.subscription = getSubscription("Jupiter");
 
@@ -210,11 +210,11 @@ class OwnCloudPluginResourceTest extends AbstractServerTest {
 
 		final List<Directory> projects = resource.findAllByName("service:storage:owncloud:dig", "p5");
 		Assertions.assertEquals(1, projects.size());
-		Assertions.assertEquals(8321, projects.get(0).getId().intValue());
-		Assertions.assertEquals("P5-p0", projects.get(0).getName());
+		Assertions.assertEquals(8321, projects.getFirst().getId().intValue());
+		Assertions.assertEquals("P5-p0", projects.getFirst().getName());
 
 		// Size is never computed in this mode
-		Assertions.assertEquals(0, projects.get(0).getSize());
+		Assertions.assertEquals(0, projects.getFirst().getSize());
 	}
 
 }
