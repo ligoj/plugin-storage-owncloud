@@ -3,22 +3,12 @@
  */
 package org.ligoj.app.plugin.storage.owncloud;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.Format;
-import java.util.List;
-import java.util.Map;
-
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.ligoj.app.api.SubscriptionStatusWithData;
 import org.ligoj.app.plugin.storage.StorageResource;
 import org.ligoj.app.plugin.storage.StorageServicePlugin;
@@ -31,7 +21,12 @@ import org.ligoj.bootstrap.core.validation.ValidationJsonException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.Format;
+import java.util.List;
+import java.util.Map;
 
 /**
  * OwnCloud resource. Also see "index.php/apps/files/ajax/list.php" : My files
@@ -95,7 +90,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	 */
 	private Directory validateProject(final Map<String, String> parameters) throws IOException, URISyntaxException {
 		// Get project's configuration
-		final int id = Integer.parseInt(ObjectUtils.defaultIfNull(parameters.get(PARAMETER_DIRECTORY), "0"));
+		final int id = Integer.parseInt(ObjectUtils.getIfNull(parameters.get(PARAMETER_DIRECTORY), "0"));
 		final Directory result = getDirectory(parameters, id);
 
 		if (result == null) {
@@ -114,7 +109,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	 * @throws IOException When OwnCloud JSON content cannot be parsed.
 	 */
 	private String validateAdminAccess(final Map<String, String> parameters) throws IOException {
-		final String url = StringUtils.appendIfMissing(parameters.get(PARAMETER_URL), "/");
+		final String url = Strings.CS.appendIfMissing(parameters.get(PARAMETER_URL), "/");
 
 		// Check access
 		CurlProcessor.validateAndClose(url, PARAMETER_URL, "owncloud-connection");
@@ -131,7 +126,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	 * Return a OwnCloud's resource. Return <code>null</code> when the resource is not found.
 	 */
 	private String getResource(final Map<String, String> parameters, final String resource) {
-		return newProcessor(parameters).get(StringUtils.appendIfMissing(parameters.get(PARAMETER_URL), "/") + resource);
+		return newProcessor(parameters).get(Strings.CS.appendIfMissing(parameters.get(PARAMETER_URL), "/") + resource);
 	}
 
 	@Override
@@ -147,7 +142,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	 */
 	private List<SharedDirectory> getDirectories(final Map<String, String> parameters) throws IOException {
 		return new ObjectMapper()
-				.readValue(StringUtils.removeEnd(StringUtils.removeStart(StringUtils.defaultIfEmpty(
+				.readValue(Strings.CS.removeEnd(Strings.CS.removeStart(StringUtils.defaultIfEmpty(
 						getResource(parameters, "ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"),
 						"{\"ocs\":{\"data\":[]}}"), "{\"ocs\":"), "}"), SharedDirectories.class)
 				.getData().stream().filter(d -> "folder".equals(d.getType())).distinct().toList();
@@ -169,7 +164,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 		// The, get the directory size from the content's size
 		final String path = "index.php/apps/files/ajax/list.php?dir="
 				+ new URI("http", sharedDirectory.getPath(), "").toURL().getPath();
-		final String files = StringUtils.removeEnd(StringUtils.removeStart(
+		final String files = Strings.CS.removeEnd(Strings.CS.removeStart(
 						StringUtils.defaultIfEmpty(getResource(parameters, path), "{\"data\":{\"files\":[]}}"), "{\"data\":"),
 				"}");
 		final Directory directory = new Directory();
@@ -203,7 +198,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 				.map(d -> {
 					final Directory dir = new Directory();
 					dir.setId(d.getId());
-					dir.setName(StringUtils.removeStart(d.getName(), "/"));
+					dir.setName(Strings.CS.removeStart(d.getName(), "/"));
 					return dir;
 				}).toList();
 	}
