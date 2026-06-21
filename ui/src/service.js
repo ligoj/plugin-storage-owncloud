@@ -12,8 +12,7 @@
  *
  * Kept free of Vue SFC imports so it can be unit-tested without a DOM.
  */
-import { h } from 'vue'
-import { VBtn, VChip, VIcon, useI18nStore } from '@ligoj/host'
+import { renderServiceLink, renderDetailsChip, useI18nStore } from '@ligoj/host'
 
 const PARAM_URL = 'service:storage:owncloud:url'
 const PARAM_DIR = 'service:storage:owncloud:directory'
@@ -27,21 +26,7 @@ function renderFeatures(subscription) {
   const base = url.replace(/\/$/, '')
   const dir = params?.[PARAM_DIR]
   const href = dir ? `${base}/apps/files/?dir=%2F${encodeURIComponent(dir)}` : `${base}/apps/files/`
-  return [
-    h(
-      VBtn,
-      {
-        icon: true,
-        size: 'small',
-        variant: 'text',
-        title: t('service:storage:owncloud:directory'),
-        href,
-        target: '_blank',
-        rel: 'noopener noreferrer',
-      },
-      () => h(VIcon, { size: 'small' }, () => 'mdi-folder-network-outline'),
-    ),
-  ]
+  return [renderServiceLink({ icon: 'mdi-folder-network-outline', href, title: t('service:storage:owncloud:directory') })]
 }
 
 /** Directory chip. Mirrors the legacy renderKey('service:storage:owncloud:directory'). */
@@ -49,11 +34,7 @@ function renderDetailsKey(subscription) {
   const dir = subscription?.parameters?.[PARAM_DIR]
   if (!dir) return null
   const { t } = useI18nStore()
-  return h(
-    VChip,
-    { size: 'small', variant: 'tonal', class: 'mr-1', title: t('service:storage:owncloud:directory') },
-    () => [h(VIcon, { start: true, size: 'small' }, () => 'mdi-folder-outline'), ' ', String(dir)],
-  )
+  return renderDetailsChip({ icon: 'mdi-folder-outline', text: dir, title: t('service:storage:owncloud:directory') })
 }
 
 export default { renderFeatures, renderDetailsKey }
