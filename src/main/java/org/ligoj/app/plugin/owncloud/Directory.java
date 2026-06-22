@@ -1,9 +1,9 @@
 /*
  * Licensed under MIT (https://github.com/ligoj/ligoj/blob/master/LICENSE)
  */
-package org.ligoj.app.plugin.storage.owncloud;
+package org.ligoj.app.plugin.owncloud;
 
-import java.util.List;
+import org.ligoj.bootstrap.core.NamedBean;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -11,15 +11,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Simple wrapper of JSON owncloud files.
+ * OwnCloud directory.
  */
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Directories {
+public class Directory extends NamedBean<Integer> {
 
 	/**
-	 * Files/directories.
+	 * SID
 	 */
-	private List<Directory> files;
+	private static final long serialVersionUID = 1L;
+
+	private long size;
+
 }

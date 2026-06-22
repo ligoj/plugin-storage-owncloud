@@ -1,7 +1,7 @@
 /*
  * Licensed under MIT (https://github.com/ligoj/ligoj/blob/master/LICENSE)
  */
-package org.ligoj.app.plugin.storage.owncloud;
+package org.ligoj.app.plugin.owncloud;
 
 import org.junit.jupiter.api.Test;
 import org.ligoj.bootstrap.model.AbstractBusinessEntityTest;
