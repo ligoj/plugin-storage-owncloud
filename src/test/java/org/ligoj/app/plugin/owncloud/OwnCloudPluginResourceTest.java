@@ -131,12 +131,12 @@ class OwnCloudPluginResourceTest extends AbstractServerTest {
 		httpServer.stubFor(get(urlEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(
 				IOUtils.toString(new ClassPathResource("mock-server/owncloud/status.php").getInputStream(), StandardCharsets.UTF_8))));
 
-		// Shares json
+		// Shares JSON
 		httpServer.stubFor(get(urlEqualTo("/ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"))
 				.willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(IOUtils
 						.toString(new ClassPathResource("mock-server/owncloud/sharing.php").getInputStream(), StandardCharsets.UTF_8))));
 
-		// Directories json
+		// Directories JSON
 		httpServer.stubFor(get(urlEqualTo("/index.php/apps/files/ajax/list.php?dir=/projects/Sample"))
 				.willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(IOUtils
 						.toString(new ClassPathResource("mock-server/owncloud/list.php").getInputStream(), StandardCharsets.UTF_8))));
@@ -148,12 +148,12 @@ class OwnCloudPluginResourceTest extends AbstractServerTest {
 		httpServer.stubFor(get(urlEqualTo("/status.php")).willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(
 				IOUtils.toString(new ClassPathResource("mock-server/owncloud/status.php").getInputStream(), StandardCharsets.UTF_8))));
 
-		// Shares json
+		// Shares JSON
 		httpServer.stubFor(get(urlEqualTo("/ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"))
 				.willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(IOUtils
 						.toString(new ClassPathResource("mock-server/owncloud/sharing.php").getInputStream(), StandardCharsets.UTF_8))));
 
-		// Directories json
+		// Directories JSON
 		httpServer.stubFor(get(urlEqualTo("/index.php/apps/files/ajax/list.php?dir=/projects/Sample"))
 				.willReturn(aResponse().withStatus(HttpStatus.SC_OK).withBody(IOUtils
 						.toString(new ClassPathResource("mock-server/owncloud/list.php").getInputStream(), StandardCharsets.UTF_8))));

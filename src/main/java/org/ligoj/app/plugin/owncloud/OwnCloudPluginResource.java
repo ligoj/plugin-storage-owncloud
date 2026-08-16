@@ -3,7 +3,6 @@
  */
 package org.ligoj.app.plugin.owncloud;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import org.apache.commons.lang3.ObjectUtils;
@@ -20,6 +19,7 @@ import org.ligoj.bootstrap.core.curl.CurlProcessor;
 import org.ligoj.bootstrap.core.validation.ValidationJsonException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.net.URI;
@@ -70,7 +70,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	public static final String PARAMETER_DIRECTORY = KEY + ":directory";
 
 	/**
-	 * Web site URL
+	 * Website URL
 	 */
 	public static final String PARAMETER_URL = KEY + ":url";
 
@@ -106,9 +106,8 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	 *
 	 * @param parameters the server parameters.
 	 * @return the detected Owncloud version.
-	 * @throws IOException When OwnCloud JSON content cannot be parsed.
 	 */
-	private String validateAdminAccess(final Map<String, String> parameters) throws IOException {
+	private String validateAdminAccess(final Map<String, String> parameters) {
 		final String url = Strings.CS.appendIfMissing(parameters.get(PARAMETER_URL), "/");
 
 		// Check access
@@ -130,7 +129,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	}
 
 	@Override
-	public String getVersion(final Map<String, String> parameters) throws IOException {
+	public String getVersion(final Map<String, String> parameters) {
 		// Get the version from the JSON status
 		return (String) new ObjectMapper()
 				.readValue(StringUtils.defaultIfEmpty(getResource(parameters, "status.php"), "{}"), Map.class)
@@ -140,7 +139,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	/**
 	 * Return all OwnCloud directories without limit.
 	 */
-	private List<SharedDirectory> getDirectories(final Map<String, String> parameters) throws IOException {
+	private List<SharedDirectory> getDirectories(final Map<String, String> parameters) {
 		return new ObjectMapper()
 				.readValue(Strings.CS.removeEnd(Strings.CS.removeStart(StringUtils.defaultIfEmpty(
 						getResource(parameters, "ocs/v1.php/apps/files_sharing/api/v1/shares?format=json"),
@@ -180,13 +179,12 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	 * @param node     the node to be tested with given parameters.
 	 * @param criteria the search criteria.
 	 * @return project names matching the criteria.
-	 * @throws IOException When OwnCloud JSON content cannot be parsed.
 	 */
 	@GET
 	@Path("{node}/{criteria}")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public List<Directory> findAllByName(@PathParam("node") final String node,
-			@PathParam("criteria") final String criteria) throws IOException {
+			@PathParam("criteria") final String criteria) {
 
 		// Prepare the context, an ordered set of projects
 		final Format format = new NormalizeFormat();
@@ -226,7 +224,7 @@ public class OwnCloudPluginResource extends AbstractToolPluginResource implement
 	}
 
 	@Override
-	public boolean checkStatus(final Map<String, String> parameters) throws Exception {
+	public boolean checkStatus(final Map<String, String> parameters) {
 		// Status is UP <=> Administration access is UP
 		validateAdminAccess(parameters);
 		return true;
