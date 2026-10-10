@@ -12,7 +12,7 @@
  *
  * Kept free of Vue SFC imports so it can be unit-tested without a DOM.
  */
-import { renderServiceLink, renderDetailsChip, useI18nStore } from '@ligoj/host'
+import { renderServiceLink, renderDetailsChip, useI18nStore, remoteSearchField } from '@ligoj/host'
 
 const PARAM_URL = 'service:storage:owncloud:url'
 const PARAM_DIR = 'service:storage:owncloud:directory'
@@ -37,4 +37,16 @@ function renderDetailsKey(subscription) {
   return renderDetailsChip({ icon: 'mdi-folder-outline', text: dir, title: t('service:storage:owncloud:directory') })
 }
 
-export default { renderFeatures, renderDetailsKey }
+// Subscribe-wizard input: the directories of the selected instance, searched as the user types
+const DirectoryField = remoteSearchField({ path: 'rest/service/storage/owncloud' })
+
+/**
+ * Subscribe-wizard hook: `service:storage:owncloud:directory` is picked among the directories.
+ * Null for every other parameter and when editing a node: the default
+ * type-based input is rendered.
+ */
+function parameterField({ parameter, isNode } = {}) {
+  return !isNode && parameter?.id === PARAM_DIR ? DirectoryField : null
+}
+
+export default { renderFeatures, renderDetailsKey, parameterField }
